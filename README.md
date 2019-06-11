@@ -32,16 +32,16 @@ Set in config file (console.php)
 'components' => [
     'container_usage' => [
             'class' => 'attek\container_usage\Usage',            
-            'adminEmail' => 'pest.attila@pte.hu',
-            'senderEmail' => 'hrdocs-cli@pte.hu',            
+            'adminEmail' => '',
+            'senderEmail' => '',            
             'maxUsers' => 10,
             'memoryUsageInPercent' => 4,
             'phpContainerRebooted' => true,
             'sqlContainerRebooted' => true,
-            'sms_service_url = 'https://apps.pte.hu/sms/';
-            'sms_auth_user = 'smsservice';
-            'sms_auth_pass = 'eC4rTFJ9';            
-            'adminPhone' => '+36205320950',
+            'sms_service_url = '';
+            'sms_auth_user = '';
+            'sms_auth_pass = '';            
+            'adminPhone' => '',
     ]
 ]
 ```

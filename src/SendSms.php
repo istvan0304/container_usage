@@ -1,6 +1,6 @@
 <?php
 
-namespace attek\container_usage;
+namespace attek\usage;
 
 use Exception;
 use linslin\yii2\curl\Curl;

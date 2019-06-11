@@ -31,7 +31,7 @@ Set in config file (console.php)
 ```php
 'modules' => [
     'container_usage' => [
-            'class' => 'attek\container_usage\Module::class',            
+            'class' => 'attek\usage\Module',            
             'adminEmail' => '',
             'senderEmail' => '',            
             'maxUsers' => 10,

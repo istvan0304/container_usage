@@ -1,9 +1,9 @@
 <?php
 
 
-namespace attek\container_usage\controllers;
+namespace attek\usage\controllers;
 
-use attek\container_usage\SendSms;
+use attek\usage\SendSms;
 use Yii;
 use yii\console\Controller;
 

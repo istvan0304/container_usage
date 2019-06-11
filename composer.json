@@ -1,5 +1,5 @@
 {
-    "name": "attek/container_usage",
+    "name": "attek/usage",
     "description": "Ha konténerben lévő apache szálak száma nagyobb a megadott értéknél, vagy a memória használat nagyobb a megadott értéknél vagy php vagy mysql konténer újraindult",
     "type": "yii2-extension",
     "keywords": ["yii2","extension"],
@@ -15,7 +15,7 @@
     },
     "autoload": {
         "psr-4": {
-            "attek\\containerusage\\": "src"
+            "attek\\usage\\": "src"
         }
     }
 }

@@ -1,10 +1,10 @@
 <?php
 
-namespace attek\container_usage;
+namespace attek\usage;
 
 
 class Module extends \yii\base\Module {
-    public $controllerNamespace = 'attek\container_usage\controllers';
+    public $controllerNamespace = 'attek\usage\controllers';
 
     public function init() {
         parent::init();

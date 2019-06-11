@@ -46,4 +46,7 @@ Set in config file (console.php)
 ]
 ```
 
-test push
+Call command in cli
+```php
+php yii container_usage/usage
+```

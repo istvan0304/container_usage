@@ -22,6 +22,21 @@ class UsageController extends Controller {
     public $sms_auth_pass;
     public $adminPhone;
 
+    public function init() {
+        $module = $this->module;
+        $this->adminEmail = $module->adminEmail;
+        $this->senderEmail = $module->senderEmail;
+        $this->maxUsers = $module->maxUsers;
+        $this->memoryUsageInPercent = $module->memoryUsageInPercent;
+        $this->phpContainerRebooted = $module->phpContainerRebooted;
+        $this->sqlContainerRebooted = $module->sqlContainerRebooted;
+        $this->sms_service_url = $module->sms_service_url;
+        $this->sms_auth_user = $module->sms_auth_user;
+        $this->sms_auth_pass = $module->sms_auth_pass;
+        $this->adminPhone = $module->adminPhone;
+        parent::init();
+    }
+
 
     /**
      * php yii usage
@@ -35,6 +50,7 @@ class UsageController extends Controller {
                 $message = Yii::$app->name . ' alkalmazásnál a kapcsolatok száma ' . $users . ', indíts új docker konténert!';
                 $this->sendAlert( $message );
                 Yii::info( $message, 'usage' );
+                echo $message . "\n";
             }
         }
 
@@ -49,6 +65,7 @@ class UsageController extends Controller {
                 $message =  Yii::$app->name . ' alkalmazás memória felhasználása: ' . number_format($memory_usage_percent, 2) . '% !';
                 $this->sendAlert( $message );
                 Yii::info($message, 'usage');
+                echo $message . "\n";
             }
         }
 
@@ -61,6 +78,7 @@ class UsageController extends Controller {
                 $message = Yii::$app->name . ' konténer újraindult!';
                 $this->sendAlert( $message );
                 Yii::info( $message, 'usage' );
+                echo $message . "\n";
             }
         }
 
@@ -71,6 +89,7 @@ class UsageController extends Controller {
                 $message =  Yii::$app->name . ' MYSQL újraindult! Uptime: ' . $sqlUptime['Value'] . ' mp.';
                 $this->sendAlert( $message );
                 Yii::info($message, 'usage');
+                echo $message . "\n";
             }
         }
 

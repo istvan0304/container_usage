@@ -31,7 +31,7 @@ Set in config file (console.php)
 ```php
 'modules' => [
     'container_usage' => [
-            'class' => 'attek\usage\Module',            
+            'class' => 'attek\usage\Module',                        
             'adminEmail' => '',
             'senderEmail' => '',            
             'maxUsers' => 10,
@@ -41,7 +41,7 @@ Set in config file (console.php)
             'sms_service_url' => '',
             'sms_auth_user' => '',
             'sms_auth_pass' => '',            
-            'adminPhone' => ''
+            'adminPhone' => ''              
     ]
 ]
 ```

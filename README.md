@@ -29,19 +29,19 @@ Once the extension is installed, simply use it in your code by  :
 
 Set in config file (console.php)
 ```php
-'components' => [
+'modules' => [
     'container_usage' => [
-            'class' => 'attek\container_usage\Usage',            
+            'class' => 'attek\container_usage\Module::class',            
             'adminEmail' => '',
             'senderEmail' => '',            
             'maxUsers' => 10,
             'memoryUsageInPercent' => 4,
             'phpContainerRebooted' => true,
             'sqlContainerRebooted' => true,
-            'sms_service_url = '';
-            'sms_auth_user = '';
-            'sms_auth_pass = '';            
-            'adminPhone' => '',
+            'sms_service_url' => '',
+            'sms_auth_user' => '',
+            'sms_auth_pass' => '',            
+            'adminPhone' => ''
     ]
 ]
 ```

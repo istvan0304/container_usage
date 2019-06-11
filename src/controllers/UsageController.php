@@ -1,14 +1,14 @@
 <?php
 
 
-namespace attek\container_usage;
+namespace attek\container_usage\controllers;
 
-use app\components\SendSms;
+use attek\container_usage\SendSms;
 use Yii;
 use yii\console\Controller;
 
 
-class Usage extends Controller {
+class UsageController extends Controller {
 
 
     public $adminEmail;

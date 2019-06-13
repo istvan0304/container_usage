@@ -33,6 +33,11 @@ class Module extends \yii\base\Module {
      * @var bool Értesítés küldése, ha a MySql konténer újraindult, default false
      */
     public $sqlContainerRebooted = false;
+
+    /**
+     * @var int MySQL szerver uptime-ja ez az érték alatt van, akkor küld értesítést az ujraindulásról, default 19;
+     */
+    public $sqlUptimeLimit = 19;
     /**
      * @var string SMS service URL
      */

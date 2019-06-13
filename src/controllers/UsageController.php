@@ -21,6 +21,7 @@ class UsageController extends Controller {
     public $sms_auth_user;
     public $sms_auth_pass;
     public $adminPhone;
+    public $sqlUptimeLimit;
 
     public function init() {
         $module = $this->module;
@@ -34,6 +35,7 @@ class UsageController extends Controller {
         $this->sms_auth_user = $module->sms_auth_user;
         $this->sms_auth_pass = $module->sms_auth_pass;
         $this->adminPhone = $module->adminPhone;
+        $this->sqlUptimeLimit = $module->sqlUptimeLimit;
         parent::init();
     }
 
@@ -85,7 +87,7 @@ class UsageController extends Controller {
         if ($this->sqlContainerRebooted) {
             $connection = Yii::$app->db;
             $sqlUptime = $connection->createCommand('SHOW STATUS WHERE Variable_name = "Uptime"')->queryOne();
-            if (isset($sqlUptime['Value']) && $sqlUptime['Value'] < 10 * 60) {
+            if (isset($sqlUptime['Value']) && $sqlUptime['Value'] < $this->sqlUptimeLimit * 60) {
                 $message =  Yii::$app->name . ' MYSQL újraindult! Uptime: ' . $sqlUptime['Value'] . ' mp.';
                 $this->sendAlert( $message );
                 Yii::info($message, 'usage');

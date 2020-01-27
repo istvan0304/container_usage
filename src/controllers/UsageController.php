@@ -8,7 +8,7 @@ use yii\console\Controller;
 
 /**
  * Class UsageController
- * @package attek\usage\controllers
+ * @package istvan0304\usage\controllers
  */
 class UsageController extends Controller {
 

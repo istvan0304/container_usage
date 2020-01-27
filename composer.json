@@ -19,7 +19,7 @@
     },
     "autoload": {
         "psr-4": {
-            "attek\\usage\\": "src"
+            "istvan0304\\usage\\": "src"
         }
     }
 }

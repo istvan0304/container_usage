@@ -8,10 +8,10 @@ use yii\base\Module as BaseModule;
 
 /**
  * Class Module
- * @package attek\usage
+ * @package istvan0304\usage
  */
 class Module extends BaseModule {
-    public $controllerNamespace = 'attek\usage\controllers';
+    public $controllerNamespace = 'istvan0304\usage\controllers';
 
     /**
      * @var string|array ws

@@ -1,16 +1,18 @@
 <?php
 
-
 namespace attek\usage\controllers;
 
-use attek\usage\SendSms;
 use Yii;
+use attek\usage\SendSms;
 use yii\console\Controller;
 
-
+/**
+ * Class UsageController
+ * @package attek\usage\controllers
+ */
 class UsageController extends Controller {
 
-
+    public $app;
     public $adminEmail;
     public $senderEmail;
     public $maxUsers = 100;
@@ -19,12 +21,14 @@ class UsageController extends Controller {
     public $sqlContainerRebooted = false;
     public $sms_service_url;
     public $sms_auth_user;
+    public $sms_auth_token;
     public $sms_auth_pass;
+    public $sms_operation;
     public $adminPhone;
-    public $sqlUptimeLimit;
 
     public function init() {
         $module = $this->module;
+        $this->app = $module->app;
         $this->adminEmail = $module->adminEmail;
         $this->senderEmail = $module->senderEmail;
         $this->maxUsers = $module->maxUsers;
@@ -33,12 +37,12 @@ class UsageController extends Controller {
         $this->sqlContainerRebooted = $module->sqlContainerRebooted;
         $this->sms_service_url = $module->sms_service_url;
         $this->sms_auth_user = $module->sms_auth_user;
+        $this->sms_auth_token = $module->sms_auth_token;
         $this->sms_auth_pass = $module->sms_auth_pass;
+        $this->sms_operation = $module->sms_operation;
         $this->adminPhone = $module->adminPhone;
-        $this->sqlUptimeLimit = $module->sqlUptimeLimit;
         parent::init();
     }
-
 
     /**
      * php yii usage
@@ -87,7 +91,7 @@ class UsageController extends Controller {
         if ($this->sqlContainerRebooted) {
             $connection = Yii::$app->db;
             $sqlUptime = $connection->createCommand('SHOW STATUS WHERE Variable_name = "Uptime"')->queryOne();
-            if (isset($sqlUptime['Value']) && $sqlUptime['Value'] < $this->sqlUptimeLimit * 60) {
+            if (isset($sqlUptime['Value']) && $sqlUptime['Value'] < 10 * 60) {
                 $message =  Yii::$app->name . ' MYSQL újraindult! Uptime: ' . $sqlUptime['Value'] . ' mp.';
                 $this->sendAlert( $message );
                 Yii::info($message, 'usage');
@@ -104,11 +108,11 @@ class UsageController extends Controller {
 
         if (!empty($this->adminEmail) && !empty($this->senderEmail)) {
             $sent = Yii::$app->mailer->compose()
-                                     ->setFrom( $this->senderEmail )
-                                     ->setSubject( Yii::$app->name . ' túlterhelés' )
-                                     ->setTextBody($message)
-                                     ->setTo( $this->adminEmail )
-                                     ->send();
+                ->setFrom( $this->senderEmail )
+                ->setSubject( Yii::$app->name . ' túlterhelés' )
+                ->setTextBody($message)
+                ->setTo( $this->adminEmail )
+                ->send();
 
             if ( ! $sent ) {
                 echo 'Usage email send error';
@@ -116,11 +120,12 @@ class UsageController extends Controller {
             }
         }
 
-        if (!empty($this->sms_service_url) && !empty($this->sms_auth_user) && !empty($this->sms_auth_pass) && !empty($this->adminPhone)) {
-            $sendSms = new SendSms( $this->sms_service_url, $this->sms_auth_user, $this->sms_auth_pass, $this->adminPhone, $message, 0 );
-            if ( ! $sendSms->getResult() ) {
-                echo 'SMS send error:' . $sendSms->getMessage();
-                Yii::error( 'SMS send error:' . $sendSms->getMessage() );
+        if (!empty($this->sms_service_url) && !empty($this->sms_auth_user) && !empty($this->sms_auth_token) && !empty($this->adminPhone) && $this->app != '' && $this->sms_operation != '') {
+            $sendSms = new SendSms( $this->app, $this->sms_service_url, $this->sms_auth_user, $this->sms_auth_token, $this->sms_auth_pass, $this->sms_operation, $this->adminPhone, $message );
+
+            if ($sendSms->getResult() != null) {
+                echo 'SMS send error:' . $sendSms->getResult() . "\n";
+                Yii::error( 'SMS send error:' . $sendSms->getResult() );
             }
         }
 

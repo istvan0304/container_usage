@@ -9,58 +9,72 @@ use Yii;
 /**
  * For Sms REST API
  * @author PEAXAAP.PTE
- * 
+ *
  * Example
- * $send_sms = new SendSms($phone, $message, 0);
+ * $send_sms = new SendSms($app, $url, $user, $token, $pass, $operation, $phone, $message);
  *
-* if ($send_sms->getResult()) {
+ * if ($send_sms->getResult()) {
  *
-* //do somehting stuff....
+ * //do somehting stuff....
  *
-* } else {
+ * } else {
  *
-* echo $send_sms->getResultMessage();
+ * echo $send_sms->getResultMessage();
  *
-* }
+ * }
  *
  */
 class SendSms
 {
-    
+    protected $app;
     protected $phone;
     protected $message;
     protected $result;
     protected $result_message;
-    protected $processed;
-    
+    protected $operation;
+
     public $auth_user;
     public $auth_pass;
+    public $auth_token;
     public $service_url;
 
     /**
-     * SMS kuldes, $processed alapesetben 1-es, igy kikkuldes nincs csak adatbazisba rogzites
+     * SMS kuldes
      *
-     * @param string $service_url
-     * @param string $auth_user
-     * @param string $auth_pass
-     * @param string $phone
-     * @param string $message
-     * @param int|number $processed
+     * SendSms constructor.
+     * @param $app
+     * @param $service_url
+     * @param $auth_user
+     * @param $sms_auth_token
+     * @param $auth_pass
+     * @param $operation
+     * @param $phone
+     * @param $message
      */
-    public function __construct($service_url, $auth_user, $auth_pass, $phone, $message, $processed = 1)
+    public function __construct($app, $service_url, $auth_user, $sms_auth_token, $auth_pass, $operation, $phone, $message)
     {
-        
+        $this->app = $app;
         $this->service_url = $service_url;
         $this->auth_user = $auth_user;
+        $this->auth_token = $sms_auth_token;
         $this->auth_pass = $auth_pass;
-        $this->phone = $phone;
+        $this->operation = $operation;
         $this->message = $message;
-        $this->processed = $processed;
-        
+
+        if(is_array($phone)){
+            $this->phone = implode(',', $phone);
+        }else{
+            $this->phone = $phone;
+        }
+
         $params = [
-            'phone' => $this->phone,
-            'message' => $this->message,
-            'processed' => $this->processed,
+            'app' => $this->app,        // app
+            'u' => $this->auth_user,    // username
+            'h' => $this->auth_token,   // webservices token, configured by user from Preferences menu
+            'p' => $this->auth_pass,    // password, supplied for op=get_token
+            'op' => $this->operation,   // operation or type of action
+            'to' => $this->phone,       // destination numbers, @username or #groupcode, may use commas
+            'msg' => $this->message,    // message (+ or %20 for spaces, urlencode for non ascii chars)
         ];
 
         $curl        = new Curl();
@@ -68,19 +82,15 @@ class SendSms
             $response = $curl
                 ->setOption( CURLOPT_FOLLOWLOCATION, true )
                 ->setOption( CURLOPT_SSL_VERIFYPEER, false )
-                ->setHeaders( [
-                    'Content-Type'  => 'application/json',
-                    'Authorization' => 'Basic ' . base64_encode( $this->auth_user . ':' . $this->auth_pass )
-                ] )
                 ->setGetParams(
                     $params
                 )
                 ->get( $this->service_url );
+
             $json = json_decode($response);
 
-
-            if (isset($json->message)) $this->result_message = $json->message;
-            if (isset($json->success)) $this->result = $json->success;
+            if (isset($json->status)) $this->result_message = $json->status;
+            if (isset($json->error)) $this->result = $json->error_string;
 
         } catch ( Exception $e ) {
             Yii::error('SMS send error: ' . $e->getMessage());
@@ -91,22 +101,22 @@ class SendSms
     {
         return $this->phone;
     }
-    
+
     public function setPhone($phone)
     {
         return $this->phone = $phone;
     }
-    
+
     public function getMessage()
     {
-        return $this->message; 
+        return $this->message;
     }
-    
+
     public function setMessage($message)
     {
         return $this->message = $message;
     }
-    
+
     /**
      * Get return from sms API
      * @return boolean
@@ -115,21 +125,21 @@ class SendSms
     {
         return $this->result;
     }
-    
+
     public function setResult($result)
     {
         return $this->result = $result;
     }
-    
+
     /**
      * Get return message from sms API
-     * @return string 
+     * @return string
      */
     public function getResultMessage()
     {
         return $this->result_message;
     }
-    
+
     public function setResultMessage($result_message)
     {
         return $this->result_message = $result_message;

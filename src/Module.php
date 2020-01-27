@@ -2,13 +2,21 @@
 
 namespace attek\usage;
 
-
 use Yii;
 use yii\log\FileTarget;
+use yii\base\Module as BaseModule;
 
-class Module extends \yii\base\Module {
+/**
+ * Class Module
+ * @package attek\usage
+ */
+class Module extends BaseModule {
     public $controllerNamespace = 'attek\usage\controllers';
 
+    /**
+     * @var string|array ws
+     */
+    public $app = 'ws';
     /**
      * @var string|array Értesítés küldése erre az email címre vagy címekre ha több
      */
@@ -33,11 +41,6 @@ class Module extends \yii\base\Module {
      * @var bool Értesítés küldése, ha a MySql konténer újraindult, default false
      */
     public $sqlContainerRebooted = false;
-
-    /**
-     * @var int MySQL szerver uptime-ja ez az érték alatt van, akkor küld értesítést az ujraindulásról, default 19;
-     */
-    public $sqlUptimeLimit = 19;
     /**
      * @var string SMS service URL
      */
@@ -47,9 +50,17 @@ class Module extends \yii\base\Module {
      */
     public $sms_auth_user;
     /**
-     * @var string SMS service jelszó
+     * @var string SMS service webszervíz token
+     */
+    public $sms_auth_token;
+    /**
+     * @var string SMS service jelszó op=get_token esetén kell
      */
     public $sms_auth_pass;
+    /**
+     * @var string SMS service művelet típus
+     */
+    public $sms_operation = 'pv';
     /**
      * @var string Erre a telefonszámara megy az SMS értesítő
      */

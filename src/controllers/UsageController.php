@@ -1,9 +1,9 @@
 <?php
 
-namespace attek\usage\controllers;
+namespace istvan0304\usage\controllers;
 
 use Yii;
-use attek\usage\SendSms;
+use istvan0304\usage\SendSms;
 use yii\console\Controller;
 
 /**

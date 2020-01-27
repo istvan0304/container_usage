@@ -10,13 +10,13 @@ The preferred way to install this extension is through [composer](http://getcomp
 Either run
 
 ```
-php composer.phar require --prefer-dist attek/container_usage "*"
+php composer.phar require --prefer-dist istvan0304/container_usage "*"
 ```
 
 or add
 
 ```
-"attek/container_usage": "*"
+"istvan0304/container_usage": "*"
 ```
 
 to the require section of your `composer.json` file.

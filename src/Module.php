@@ -1,6 +1,6 @@
 <?php
 
-namespace attek\usage;
+namespace istvan0304\usage;
 
 use Yii;
 use yii\log\FileTarget;

@@ -1,6 +1,6 @@
 <?php
 
-namespace attek\usage;
+namespace istvan0304\usage;
 
 use Exception;
 use linslin\yii2\curl\Curl;

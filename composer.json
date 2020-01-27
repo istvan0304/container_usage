@@ -6,6 +6,10 @@
     "license": "Apache-2.0",
     "authors": [
         {
+            "name": "Attek",
+            "email": "pest.attila@pte.hu"
+        },
+        {
             "name": "istvan0304",
             "email": "szalai.istvan@pte.hu"
         }

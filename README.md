@@ -38,9 +38,12 @@ Set in config file (console.php)
             'memoryUsageInPercent' => 4,
             'phpContainerRebooted' => true,
             'sqlContainerRebooted' => true,
+            'app' => 'ws',
             'sms_service_url' => '',
+            'sms_auth_token' => '',
             'sms_auth_user' => '',
             'sms_auth_pass' => '',            
+            'sms_operation' => 'pv',            
             'adminPhone' => ''              
     ]
 ]

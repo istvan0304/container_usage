@@ -10,13 +10,13 @@ The preferred way to install this extension is through [composer](http://getcomp
 Either run
 
 ```
-php composer.phar require --prefer-dist istvan0304/container_usage "*"
+php composer.phar require --prefer-dist istvan0304/usage "*"
 ```
 
 or add
 
 ```
-"istvan0304/container_usage": "*"
+"istvan0304/usage": "*"
 ```
 
 to the require section of your `composer.json` file.

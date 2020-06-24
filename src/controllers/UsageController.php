@@ -77,7 +77,8 @@ class UsageController extends Controller {
 
 
         if ($this->phpContainerRebooted) {
-            $filePath = '/root/.not_rebooted';
+//            $filePath = '/root/.not_rebooted';
+            $filePath = '/home/www-data/.not_rebooted';
             if ( ! is_file( $filePath ) ) {
                 $file = fopen( $filePath, "w" );
                 fclose( $file );

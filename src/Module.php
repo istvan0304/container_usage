@@ -11,28 +11,29 @@ use yii\base\Module as BaseModule;
  * @package istvan0304\usage
  */
 class Module extends BaseModule {
+
     public $controllerNamespace = 'istvan0304\usage\controllers';
 
     /**
-     * @var string|array ws
+     * Nagios fájl elérési útvonala.
+     * @var string
      */
-    public $app = 'ws';
+    public $nagiosFilePath  = DIRECTORY_SEPARATOR . 'nagios';
     /**
-     * @var string|array Értesítés küldése erre az email címre vagy címekre ha több
+     * Fájl név.
+     * @var string
      */
-    public $adminEmail;
+    public $nagiosFileName  = 'watch.txt';
     /**
-     * @var string Feladó email címe
+     * Szálk számának figyelése. Default true.
+     * @var bool
      */
-    public $senderEmail;
+    public $watchThreads  = true;
     /**
-     * @var int Értesítés küldése, ha a apache szálak szám a megadott érték fölött van, default 100
+     * Memória figyelés. Default true.
+     * @var bool
      */
-    public $maxUsers = 100;
-    /**
-     * @var int Értesítés küldése, ha a memória kihaszáltság a megadott százalék fölött van, default 80
-     */
-    public $memoryUsageInPercent = 80;
+    public $memoryWatch = true;
     /**
      * @var bool Értesítés küldése, ha a php konténer újraindult, default true
      */
@@ -40,31 +41,12 @@ class Module extends BaseModule {
     /**
      * @var bool Értesítés küldése, ha a MySql konténer újraindult, default false
      */
-    public $sqlContainerRebooted = false;
+    public $sqlContainerRebooted = true;
     /**
-     * @var string SMS service URL
+     * Csatolások.
+     * @var array
      */
-    public $sms_service_url;
-    /**
-     * @var string SMS service felhasználó név
-     */
-    public $sms_auth_user;
-    /**
-     * @var string SMS service webszervíz token
-     */
-    public $sms_auth_token;
-    /**
-     * @var string SMS service jelszó op=get_token esetén kell
-     */
-    public $sms_auth_pass;
-    /**
-     * @var string SMS service művelet típus
-     */
-    public $sms_operation = 'pv';
-    /**
-     * @var string Erre a telefonszámara megy az SMS értesítő
-     */
-    public $adminPhone;
+    public $volumes = [];
 
     public function init() {
 

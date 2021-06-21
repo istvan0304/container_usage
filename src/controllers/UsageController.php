@@ -3,132 +3,110 @@
 namespace istvan0304\usage\controllers;
 
 use Yii;
-use istvan0304\usage\SendSms;
 use yii\console\Controller;
+use yii\helpers\Console;
 
 /**
  * Class UsageController
  * @package istvan0304\usage\controllers
  */
-class UsageController extends Controller {
+class UsageController extends Controller
+{
 
-    public $app;
-    public $adminEmail;
-    public $senderEmail;
-    public $maxUsers = 100;
-    public $memoryUsageInPercent = 80;
-    public $phpContainerRebooted = true;
-    public $sqlContainerRebooted = false;
-    public $sms_service_url;
-    public $sms_auth_user;
-    public $sms_auth_token;
-    public $sms_auth_pass;
-    public $sms_operation;
-    public $adminPhone;
+    public $nagiosFilePath;
+    public $nagiosFileName;
+    public $watchThreads;
+    public $memoryWatch;
+    public $phpContainerRebooted;
+    public $sqlContainerRebooted;
+    public $volumes;
 
-    public function init() {
+    public function init()
+    {
         $module = $this->module;
-        $this->app = $module->app;
-        $this->adminEmail = $module->adminEmail;
-        $this->senderEmail = $module->senderEmail;
-        $this->maxUsers = $module->maxUsers;
-        $this->memoryUsageInPercent = $module->memoryUsageInPercent;
+        $this->nagiosFilePath = trim(rtrim($module->nagiosFilePath, '\/'));
+        $this->nagiosFileName = trim(ltrim($module->nagiosFileName, '\/'));
+        $this->watchThreads = $module->watchThreads;
+        $this->memoryWatch = $module->memoryWatch;
         $this->phpContainerRebooted = $module->phpContainerRebooted;
         $this->sqlContainerRebooted = $module->sqlContainerRebooted;
-        $this->sms_service_url = $module->sms_service_url;
-        $this->sms_auth_user = $module->sms_auth_user;
-        $this->sms_auth_token = $module->sms_auth_token;
-        $this->sms_auth_pass = $module->sms_auth_pass;
-        $this->sms_operation = $module->sms_operation;
-        $this->adminPhone = $module->adminPhone;
+        $this->volumes = $module->volumes;
+
         parent::init();
     }
 
     /**
      * php yii usage
      */
-    public function actionIndex() {
+    public function actionIndex()
+    {
+        $containerMessage = '';
 
-        if ($this->maxUsers > 0) {
-            $users = exec( 'ps -aux | grep apache2 | wc -l' );
-            //apache szalak szama
-            if ( $users > $this->maxUsers ) {
-                $message = Yii::$app->name . ' alkalmazásnál a kapcsolatok száma ' . $users . ', indíts új docker konténert!';
-                $this->sendAlert( $message );
-                Yii::info( $message, 'usage' );
-                echo $message . "\n";
-            }
-        }
-
-        //memoria kihasznaltsag
-        if ($this->memoryUsageInPercent > 0) {
-
-            $memory_limit =  exec('cat /sys/fs/cgroup/memory/memory.limit_in_bytes');
-            $memory_usage = exec('cat /sys/fs/cgroup/memory/memory.usage_in_bytes');
-            $memory_usage_percent = $memory_usage/$memory_limit * 100;
-
-            if ($memory_usage_percent > $this->memoryUsageInPercent) {
-                $message =  Yii::$app->name . ' alkalmazás memória felhasználása: ' . number_format($memory_usage_percent, 2) . '% !';
-                $this->sendAlert( $message );
-                Yii::info($message, 'usage');
-                echo $message . "\n";
-            }
-        }
-
-
+        // .not_rebooted fájl létrehozásának idejét adja vissza.
         if ($this->phpContainerRebooted) {
-//            $filePath = '/root/.not_rebooted';
             $filePath = '/home/www-data/.not_rebooted';
-            if ( ! is_file( $filePath ) ) {
-                $file = fopen( $filePath, "w" );
-                fclose( $file );
-                $message = Yii::$app->name . ' konténer újraindult!';
-                $this->sendAlert( $message );
-                Yii::info( $message, 'usage' );
-                echo $message . "\n";
+            if (!is_file($filePath)) {
+                $file = fopen($filePath, "w");
+                fclose($file);
             }
+
+            $containerMessage .= 'php_reboot|' . date('Y-m-d H:i:s', filemtime($filePath)) . PHP_EOL;
         }
 
+        // Sql konténer legutolsó újraindulásának az időpontját adja vissza.
         if ($this->sqlContainerRebooted) {
             $connection = Yii::$app->db;
-            $sqlUptime = $connection->createCommand('SHOW STATUS WHERE Variable_name = "Uptime"')->queryOne();
-            if (isset($sqlUptime['Value']) && $sqlUptime['Value'] < 10 * 60) {
-                $message =  Yii::$app->name . ' MYSQL újraindult! Uptime: ' . $sqlUptime['Value'] . ' mp.';
-                $this->sendAlert( $message );
-                Yii::info($message, 'usage');
-                echo $message . "\n";
-            }
+            $sqlUpSince = $connection->createCommand('SELECT NOW() - INTERVAL VARIABLE_VALUE SECOND AS "value"
+            FROM performance_schema.session_status
+            WHERE VARIABLE_NAME = "Uptime"')->queryOne();
+            $containerMessage .= 'sql_reboot|' . $sqlUpSince['value'] . PHP_EOL;
         }
 
+        // Memória adatok
+        if ($this->memoryWatch) {
+            $memoryLimit = exec('cat /sys/fs/cgroup/memory/memory.limit_in_bytes');
+            $memoryUsage = exec('cat /sys/fs/cgroup/memory/memory.usage_in_bytes');
+//            $memoryUsagePercent = $memoryUsage / $memoryLimit * 100;
+            $memoryMessage = 'memory|' . $memoryLimit . '|' . $memoryUsage . PHP_EOL;
+            $containerMessage .= $memoryMessage;
+        }
+
+        // Apache szálak száma
+        if ($this->memoryWatch) {
+            $users = exec('ps -aux | grep apache2 | wc -l');
+            $containerMessage .= 'threads|' . $users . PHP_EOL;
+        }
+
+        // Csatolások figyelése.
+        if (is_array($this->volumes) && !empty($this->volumes)){
+            $volumeMessage = '';
+
+            foreach ($this->volumes as $key => $volumeErrorPath){
+                if(file_exists($volumeErrorPath)){
+                    $volumeMessage .= $key . '|' . date('Y-m-d H:i:s', filemtime($volumeErrorPath)) . PHP_EOL;
+                }else{
+                    $volumeMessage .= $key . '|' . 0 . PHP_EOL;
+                }
+            }
+
+            $containerMessage .= $volumeMessage;
+        }
+
+        Console::output($containerMessage);
+
+        if(!is_dir($this->nagiosFilePath)){
+            mkdir($this->nagiosFilePath, 0777, true);
+        }
+
+        file_put_contents($this->getPath(), $containerMessage);
+        Yii::info($containerMessage, 'usage');
     }
 
     /**
-     * @param string $message
+     * @return string
      */
-    private function sendAlert( string $message ): void {
-
-        if (!empty($this->adminEmail) && !empty($this->senderEmail)) {
-            $sent = Yii::$app->mailer->compose()
-                ->setFrom( $this->senderEmail )
-                ->setSubject( Yii::$app->name . ' túlterhelés' )
-                ->setTextBody($message)
-                ->setTo( $this->adminEmail )
-                ->send();
-
-            if ( ! $sent ) {
-                echo 'Usage email send error';
-                Yii::error( 'Usage email send error' );
-            }
-        }
-
-        if (!empty($this->sms_service_url) && !empty($this->sms_auth_user) && !empty($this->sms_auth_token) && !empty($this->adminPhone) && $this->app != '' && $this->sms_operation != '') {
-            $sendSms = new SendSms( $this->app, $this->sms_service_url, $this->sms_auth_user, $this->sms_auth_token, $this->sms_auth_pass, $this->sms_operation, $this->adminPhone, $message );
-
-            if ($sendSms->getResult() != null) {
-                echo 'SMS send error:' . $sendSms->getResult() . "\n";
-                Yii::error( 'SMS send error:' . $sendSms->getResult() );
-            }
-        }
-
+    protected function getPath()
+    {
+        return trim(rtrim($this->nagiosFilePath, '\/')) . DIRECTORY_SEPARATOR . trim(ltrim($this->nagiosFileName, '\/'));
     }
 }

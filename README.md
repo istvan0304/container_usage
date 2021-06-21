@@ -1,6 +1,6 @@
-Konténer túlterhelés riasztás
+Konténer figyelő
 =============================
-Ha konténerben lévő apache szálak száma nagyobb a megadott értéknél, vagy a memória használat nagyobb a megadott értéknél vagy php vagy mysql konténer újraindult
+A nagios számára rak le egy text fájlt a megadott helyre amit a nagios figyel.
 
 Installation
 ------------
@@ -32,19 +32,13 @@ Set in config file (console.php)
 'modules' => [
     'container_usage' => [
             'class' => 'istvan0304\usage\Module',                        
-            'adminEmail' => '',
-            'senderEmail' => '',            
-            'maxUsers' => 10,
-            'memoryUsageInPercent' => 4,
+            'nagiosFilePath'  => '/nagios',
+            'nagiosFileName'  => 'watch.txt',
+            'watchThreads'  => true,
+            'memoryWatch'  => true,
             'phpContainerRebooted' => true,
             'sqlContainerRebooted' => true,
-            'app' => 'ws',
-            'sms_service_url' => '',
-            'sms_auth_token' => '',
-            'sms_auth_user' => '',
-            'sms_auth_pass' => '',            
-            'sms_operation' => 'pv',            
-            'adminPhone' => ''              
+            'volumes' => []
     ]
 ]
 ```

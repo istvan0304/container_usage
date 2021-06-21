@@ -44,7 +44,7 @@ class UsageController extends Controller
 
         // .not_rebooted fájl létrehozásának idejét adja vissza.
         if ($this->phpContainerRebooted) {
-            $filePath = '/home/www-data/.not_rebooted';
+            $filePath = '/var/.not_rebooted';
             if (!is_file($filePath)) {
                 $file = fopen($filePath, "w");
                 fclose($file);
